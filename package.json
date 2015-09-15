@@ -21,9 +21,14 @@
   },
   "homepage": "https://github.com/evanrs/api.cmyk.nyc#readme",
   "devDependencies": {
+    "chai": "^3.2.0",
+    "chai-passport-strategy": "^0.2.0",
     "mocha": "^2.3.2"
   },
   "dependencies": {
-    "babel": "^5.8.23"
+    "babel": "^5.8.23",
+    "jsonwebtoken": "^5.0.5",
+    "passport": "^0.3.0",
+    "passport-http-bearer": "^1.0.1"
   }
 }
