@@ -1,0 +1,23 @@
+{
+  "name": "api.cmyk.nyc",
+  "version": "1.0.0",
+  "description": "CMYK API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evanrs/api.cmyk.nyc.git"
+  },
+  "keywords": [
+    "CMYK",
+    "API"
+  ],
+  "author": "Evan Schneider",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/evanrs/api.cmyk.nyc/issues"
+  },
+  "homepage": "https://github.com/evanrs/api.cmyk.nyc#readme"
+}
