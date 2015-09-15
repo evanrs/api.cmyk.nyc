@@ -4,7 +4,7 @@
   "description": "CMYK API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers js:babel/register"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,11 @@
   "bugs": {
     "url": "https://github.com/evanrs/api.cmyk.nyc/issues"
   },
-  "homepage": "https://github.com/evanrs/api.cmyk.nyc#readme"
+  "homepage": "https://github.com/evanrs/api.cmyk.nyc#readme",
+  "devDependencies": {
+    "mocha": "^2.3.2"
+  },
+  "dependencies": {
+    "babel": "^5.8.23"
+  }
 }
