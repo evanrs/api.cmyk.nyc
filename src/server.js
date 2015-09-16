@@ -2,13 +2,16 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
+const session = require('express-session');
 const passport = require('passport');
 
 const debug = require('debug')('cmyk:server');
 const server = require('express')();
 
+const auth = require('./auth');
+
+
 const PORT = process.env.PORT || 3000;
-const {SECRET, withAuthenticatedUser} = require('./auth');
 
 // Redirect for HTTPS
 server.set('trust proxy', true);
@@ -33,24 +36,20 @@ server.use(function (req, res, next) {
 
 server.use(compression());
 server.use(bodyParser.json());
-server.use(cookieParser(SECRET, {
-  secure: false,
-  domain: '.cmyk.nyc'
-}));
+server.use(session({secret: auth.SECRET, cookie: auth.COOKIE}));
+server.use(cookieParser(auth.SECRET, auth.COOKIE));
 server.use(csrf({cookie: true}));
 server.use(passport.initialize());
+server.use(passport.session());
 
+auth.github.connect(server);
 
-server.use('/sanity', (req, res) => res.send({message: 'you\'re OK'}));
-
-
-server.use('/login', function (req, res, next) {
-  var token = require('jsonwebtoken').sign({id: 123, role: 'admin'}, SECRET);
-  res.cookie('authorization', token, {domain: '.cmyk.nyc'});
-  res.sendStatus(200);
+server.get('/logout', function logout (request, response) {
+  request.logout();
+  response.redirect('/');
 });
 
-server.use('/', withAuthenticatedUser, function (req, res, next) {
+server.use('/', auth.requireUser, function (req, res, next) {
   res.send(req.user);
   next();
 });
