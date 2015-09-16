@@ -46,7 +46,7 @@ server.use('/sanity', (req, res) => res.send({message: 'you\'re OK'}));
 
 server.use('/login', function (req, res, next) {
   var token = require('jsonwebtoken').sign({id: 123, role: 'admin'}, SECRET);
-  res.cookie('authorization', token);
+  res.cookie('authorization', token, {domain: '.cmyk.nyc'});
   res.sendStatus(200);
 });
 
