@@ -4,6 +4,7 @@
   "description": "CMYK API",
   "main": "index.js",
   "scripts": {
+    "start": "DEBUG=* node index.js",
     "test": "mocha --compilers js:babel/register"
   },
   "repository": {
