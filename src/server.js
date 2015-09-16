@@ -4,10 +4,10 @@ const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
 const passport = require('passport');
 
-
 const debug = require('debug')('cmyk:server');
 const server = require('express')();
 
+const PORT = process.env.PORT || 3000;
 const {SECRET, withAuthenticatedUser} = require('./auth');
 
 // Redirect for HTTPS
@@ -55,5 +55,5 @@ server.use('/', withAuthenticatedUser, function (req, res, next) {
   next();
 });
 
-var connection = server.listen(3000, () =>
+var connection = server.listen(PORT, () =>
   debug(`Listening at port ${connection.address().port}`));
