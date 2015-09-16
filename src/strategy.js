@@ -35,7 +35,7 @@ class Strategy extends BearStrategy {
   authenticate(request) {
     let token = req.headers.authorization || req.cookies['authorization'];
 
-    if (!token) return this.fail(401);
+    if (! token) return this.fail(401);
 
     req.headers.authorization =
       /^Bearer/.test(token) ? token : `Bearer ${token}`;
