@@ -64,7 +64,7 @@ module.exports = {
         let {profile: {displayName, _json: {avatar_url}}} = user;
         validation = JSON.stringify({displayName, avatar_url});
       }
-      res.cookie('authorized', validation, {domain: COOKIE.domain})
+      res.cookie('authorized', validation, COOKIE)
       next(err);
     })(req, res, next)
   },
