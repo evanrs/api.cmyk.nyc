@@ -24,8 +24,7 @@ server.use(function (req, res, next) {
 
   // If https terminated by heroku, or express asserts the conn. is encrypted,
   // or the protocol matches https, then we're good!
-  if (req.secure ||
-      req.headers['x-forwarded-proto'] === 'https' ||
+  if (req.headers['x-forwarded-proto'] === 'https' ||
       req.connection.encrypted ||
       req.protocol === 'https') {
     res.header(
@@ -34,7 +33,8 @@ server.use(function (req, res, next) {
     next();
   }
   else
-    res.redirect(`https://${req.get('host')}${req.url}`);
+    res.sendStatus(404)
+    // res.redirect(`https://${req.get('host')}${req.url}`);
 });
 
 server.use(cors({origin: true, credentials: true}));
