@@ -51,7 +51,7 @@ const github = {
         err = err || e;
       }
 
-      resonse.send(500, err);
+      response.send(500, err);
 
     })(request, response, next);
   }
