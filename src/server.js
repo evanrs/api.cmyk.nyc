@@ -59,12 +59,12 @@ server.get('/logout', function logout (request, response) {
   });
 });
 
-server.use('/profile', auth.requireUser, function (req, res, next) {
+server.get('/profile', auth.requireUser, function (req, res, next) {
   res.json(req.user.profile);
   next();
 });
 
-server.use('/', auth.requireUser, function (req, res, next) {
+server.get('/', auth.requireUser, function (req, res, next) {
   res.json(req.user);
   next();
 });
