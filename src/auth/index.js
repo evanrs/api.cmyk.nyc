@@ -14,8 +14,18 @@ const COOKIE = {
   secure: process.env.NODE_ENV === 'production'
 }
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
+const cache = {};
+
+passport.serializeUser((user, done) => {
+  let {id} = user.profile;
+  cache[id] = user;
+
+  done(null, id);
+});
+passport.deserializeUser((id, done) => {
+
+  done(null, cache[id]);
+});
 
 passport.use(
   new Strategy(
@@ -42,7 +52,8 @@ module.exports = {
   requireUser (req, res, next) {
     passport.authenticate('cmyk', (err, user, info) =>
       ! user ? res.sendStatus(401)
-      : req.login(user, (err) => err ? res.sendStatus(500) : next())
+      : req.login(user, (err) =>
+          err ? res.sendStatus(500) : next())
     )(req, res, next);
   },
 
