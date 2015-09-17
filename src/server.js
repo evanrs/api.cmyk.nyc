@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const csrf = require('csurf');
 const session = require('express-session');
 const passport = require('passport');
@@ -36,6 +37,7 @@ server.use(function (req, res, next) {
     res.redirect(`https://${req.get('host')}${req.url}`);
 });
 
+server.use(cors());
 server.use(compression());
 server.use(bodyParser.json());
 server.use(session({secret: auth.SECRET, cookie: auth.COOKIE}));
