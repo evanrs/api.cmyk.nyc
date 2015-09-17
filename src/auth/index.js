@@ -68,8 +68,10 @@ module.exports = {
     handleCallback (req, res, next) {
       passport.authenticate('github', function (err, user, info) {
         if (! err && user) try {
-          req.session.authorization = jsonwebtoken.sign(user, SUPER_SECRET);
-          res.cookie('authorization', req.session.authorization, COOKIE);
+          let expires = new Date(COOKIE.maxAge);
+          let token = jsonwebtoken.sign(user, SUPER_SECRET);
+
+          res.cookie('authorization', token, {...COOKIE, expires});
         } catch (e) { err = err || e }
 
         next(err);
