@@ -9,6 +9,7 @@ const SECRET = 'secret';
 const SUPER_SECRET = 'much more secret'
 const COOKIE = {
   domain: process.env.COOKIE_DOMAIN,
+  maxAge: 1000 * 60 * 60 * 24 * 14,
   path: '/',
   secure: process.env.NODE_ENV === 'production'
 }
