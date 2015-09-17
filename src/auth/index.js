@@ -20,6 +20,19 @@ passport.use(
     {secret: SUPER_SECRET},
     (request, user, done) => done(null, user)));
 
+function saveReferrer(req, res, next) {
+  req.session.referrer = req.get('referrer');
+  next();
+}
+
+function loadReferrer(req, res, next) {
+  let {referrer} = req.session;
+  req.session.referrer = void 0;
+  req.session.save();
+
+  res.redirect(referrer || '/')
+}
+
 module.exports = {
   SECRET,
   COOKIE,
@@ -61,17 +74,4 @@ module.exports = {
       })(req, res, next);
     }
   }
-}
-
-function saveReferrer(req, res, next) {
-  req.session.referrer = req.get('referrer');
-  next();
-}
-
-function loadReferrer(req, res, next) {
-  let {referrer} = req.session;
-  req.session.referrer = void 0;
-  req.session.save();
-
-  res.redirect(referrer || '/')
 }
