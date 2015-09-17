@@ -37,7 +37,7 @@ server.use(function (req, res, next) {
     res.redirect(`https://${req.get('host')}${req.url}`);
 });
 
-server.use(cors());
+server.use(cors({origin: true, credentials: true}));
 server.use(compression());
 server.use(bodyParser.json());
 server.use(session({secret: auth.SECRET, cookie: auth.COOKIE}));
