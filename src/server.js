@@ -38,6 +38,7 @@ server.use(function (req, res, next) {
 });
 
 server.use(cors({origin: true, credentials: true}));
+server.options('*', cors());
 server.use(compression());
 server.use(bodyParser.json());
 server.use(
@@ -51,13 +52,8 @@ server.use(csrf({cookie: true}));
 server.use(passport.initialize());
 server.use(passport.session());
 
+auth.connect(server);
 auth.github.connect(server);
-
-server.get('/logout', function logout (request, response) {
-  request.session.destroy(function (err) {
-    response.redirect(request.get('referrer') || '/');
-  });
-});
 
 server.get('/profile', auth.requireUser, function (req, res, next) {
   res.json(req.user.profile);
