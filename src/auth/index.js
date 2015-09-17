@@ -20,49 +20,57 @@ passport.use(
     {secret: SUPER_SECRET},
     (request, user, done) => done(null, user)));
 
-const github = {
-  connect(server) {
-    debugger;
-    passport.use(
-      new GithubStrategy({
-          clientID: process.env.GITHUB_CLIENT_ID,
-          clientSecret: process.env.GITHUB_CLIENT_SECRET,
-          callbackURL: `${server.locals.domain}/auth/github/callback`,
-          scope: ['user', 'gist']
-        },
-        (accessToken, refreshToken, profile, done) =>
-          done(null, {
-            accessToken,
-            refreshToken,
-            profile: {...profile, _raw: false}})));
-
-    server.get('/auth/github', passport.authenticate('github'));
-    server.get('/auth/github/callback', this.handleCallback, (req, res) =>
-      res.redirect('/'));
+module.exports = {
+  SECRET,
+  COOKIE,
+  // route decorators
+  requireUser (request, response, next) {
+    passport.authenticate('cmyk', { session: false }, (err, user, info) =>
+      ! user ? response.sendStatus(401)
+      : request.login(user, (err) => err ? response.sendStatus(500) : next())
+    )(request, response, next);
   },
+  // Providers
+  github: {
+    connect(server) {
+      passport.use(
+        new GithubStrategy({
+            clientID: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            callbackURL: `${server.locals.domain}/auth/github/callback`,
+            scope: ['user', 'gist']
+          },
+          (accessToken, refreshToken, profile, done) =>
+            done(null, {
+              accessToken,
+              refreshToken,
+              profile: {...profile, _raw: false}})));
 
-  handleCallback (request, response, next) {
-    passport.authenticate('github', function (err, user, info) {
-      if (! err && user) try {
-        request.session.authorization =
-          jsonwebtoken.sign({...user}, SUPER_SECRET);
-      }
-      catch (e) {
-        err = err || e;
-      }
+      server.get('/auth/github', saveReferrer, passport.authenticate('github'));
+      server.get('/auth/github/callback', this.handleCallback, loadReferrer);
+    },
 
-      response.send(500, err);
+    handleCallback (request, response, next) {
+      passport.authenticate('github', function (err, user, info) {
+        if (! err && user) try {
+          request.session.authorization = jsonwebtoken.sign(user, SUPER_SECRET);
+        } catch (e) { err = err || e }
 
-    })(request, response, next);
+        next(err);
+      })(request, response, next);
+    }
   }
 }
 
-function requireUser (request, response, next) {
-  passport.authenticate('cmyk', { session: false }, (err, user, info) =>
-    ! user ? response.sendStatus(401)
-    : request.login(user, (err) => err ? response.sendStatus(500) : next())
-  )(request, response, next);
+function saveReferrer(req, res, next) {
+  req.session.referrer = req.get('referrer');
+  next();
 }
 
-module.exports = {
-  SECRET, COOKIE, github, requireUser};
+function loadReferrer(req, res, next) {
+  let {referrer} = req.session;
+  req.session.referrer = void 0;
+  req.session.save();
+
+  res.redirect(referrer || '/')
+}
