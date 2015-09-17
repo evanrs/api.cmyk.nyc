@@ -50,7 +50,8 @@ auth.github.connect(server);
 
 server.get('/logout', function logout (request, response) {
   request.logout();
-  response.redirect('/');
+  response.clearCookie('authorization');
+  response.redirect(request.get('referrer') || '/');
 });
 
 server.use('/', auth.requireUser, function (req, res, next) {

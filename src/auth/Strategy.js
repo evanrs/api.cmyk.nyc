@@ -27,8 +27,8 @@ class Strategy extends BearStrategy {
   authenticate(request) {
     let token =
       request.headers.authorization ||
-      request.session.authorization ||
-      request.cookies.authorization
+      request.cookies.authorization ||
+      request.session.authorization;
 
     if (! token) return this.fail(401);
 

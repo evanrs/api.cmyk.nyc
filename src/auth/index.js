@@ -50,14 +50,15 @@ module.exports = {
       server.get('/auth/github/callback', this.handleCallback, loadReferrer);
     },
 
-    handleCallback (request, response, next) {
+    handleCallback (req, res, next) {
       passport.authenticate('github', function (err, user, info) {
         if (! err && user) try {
-          request.session.authorization = jsonwebtoken.sign(user, SUPER_SECRET);
+          req.session.authorization = jsonwebtoken.sign(user, SUPER_SECRET);
+          res.cookie('authorization', req.session.authorization, COOKIE);
         } catch (e) { err = err || e }
 
         next(err);
-      })(request, response, next);
+      })(req, res, next);
     }
   }
 }
