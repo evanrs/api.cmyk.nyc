@@ -54,9 +54,10 @@ server.use(passport.session());
 auth.github.connect(server);
 
 server.get('/logout', function logout (request, response) {
-  response.cookie('authorization', '', {...auth.COOKIE, expires: new Date(1)});
-  request.logout();
-  response.redirect(request.get('referrer') || '/');
+  request.session.authorization = '';
+  request.session.destroy(function (err) {
+    response.redirect(request.get('referrer') || '/');
+  });
 });
 
 server.use('/', auth.requireUser, function (req, res, next) {
