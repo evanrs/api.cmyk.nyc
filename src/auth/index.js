@@ -8,8 +8,9 @@ const Strategy = require('./Strategy');
 const SECRET = 'secret';
 const SUPER_SECRET = 'much more secret'
 const COOKIE = {
-  secure: process.env.NODE_ENV === 'production',
-  domain: process.env.COOKIE_DOMAIN
+  domain: process.env.COOKIE_DOMAIN,
+  path: '/',
+  secure: process.env.NODE_ENV === 'production'
 }
 
 passport.serializeUser((user, done) => done(null, user));
