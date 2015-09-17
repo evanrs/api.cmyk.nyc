@@ -5,13 +5,15 @@ const csrf = require('csurf');
 const session = require('express-session');
 const passport = require('passport');
 
+
+const auth = require('./auth');
 const debug = require('debug')('cmyk:server');
 const server = require('express')();
 
-const auth = require('./auth');
-
-
-const PORT = process.env.PORT || 3000;
+server.locals.port = process.env.PORT || 3000;
+server.locals.domain =
+  process.env.NODE_ENV === 'production' ?
+    'https://api.cmyk.nyc' : `http://localhost:${server.locals.port}`;
 
 // Redirect for HTTPS
 server.set('trust proxy', true);
@@ -54,5 +56,5 @@ server.use('/', auth.requireUser, function (req, res, next) {
   next();
 });
 
-var connection = server.listen(PORT, () =>
+var connection = server.listen(server.locals.port, () =>
   debug(`Listening at port ${connection.address().port}`));
