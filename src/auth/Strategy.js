@@ -1,5 +1,6 @@
 const BearStrategy = require('passport-http-bearer');
 const jsonwebtoken = require('jsonwebtoken');
+const result = require('lodash/object/result');
 
 /**
  * @constructor
@@ -26,9 +27,9 @@ class Strategy extends BearStrategy {
    */
   authenticate(request) {
     let token =
-      request.headers.authorization ||
-      request.session.authorization ||
-      request.cookies.authorization;
+      result(request.headers, 'authorization') ||
+      result(request.session, 'authorization') ||
+      result(request.cookies, 'authorization');
 
     if (! token) return this.fail(401);
 

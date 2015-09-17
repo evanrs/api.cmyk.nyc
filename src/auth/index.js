@@ -20,31 +20,66 @@ passport.deserializeUser((user, done) => done(null, user));
 passport.use(
   new Strategy(
     {secret: SUPER_SECRET},
-    (request, user, done) => done(null, user)));
+    (req, user, done) => done(null, user)));
 
 function saveReferrer(req, res, next) {
   req.session.referrer = req.get('referrer');
   next();
 }
 
-function loadReferrer(req, res, next) {
+function loadReferrer(req, res) {
   let {referrer} = req.session;
   req.session.referrer = void 0;
   req.session.save();
-
-  res.redirect(referrer || '/')
+  req.xhr ? res.json(req.user) : res.redirect(referrer || '/');
 }
 
+const auth =
 module.exports = {
   SECRET,
   COOKIE,
   // route decorators
-  requireUser (request, response, next) {
-    passport.authenticate('cmyk', { session: false }, (err, user, info) =>
-      ! user ? response.sendStatus(401)
-      : request.login(user, (err) => err ? response.sendStatus(500) : next())
-    )(request, response, next);
+  requireUser (req, res, next) {
+    passport.authenticate('cmyk', (err, user, info) =>
+      ! user ? res.sendStatus(401)
+      : req.login(user, (err) => err ? res.sendStatus(500) : next())
+    )(req, res, next);
   },
+
+  validate (req, res, next) {
+    passport.authenticate('cmyk', (err, user, info) => {
+      let validation = '';
+      if (user) {
+        let {profile: {displayName, _json: {avatar_url}}} = user;
+        validation = JSON.stringify({displayName, avatar_url});
+      }
+      res.cookie('authorized', validation, {domain: COOKIE.domain})
+      next(err);
+    })(req, res, next)
+  },
+
+  logout(req, res, next) {
+    req.logout();
+    req.session.destroy((err) => next(err));
+  },
+
+  handleError (err, req, res, next) {
+    debugger;
+  },
+
+  connect(server) {
+    server.get(
+      '/auth/validate', auth.validate, auth.handleError, (req, res) => res.send(200));
+    server.get(
+      '/logout',
+      auth.logout,
+      auth.validate,
+      auth.handleError,
+      (req, res, next) =>
+        req.xhr ? res.send(200) : res.redirect(req.get('referrer') || '/')
+    );
+  },
+
   // Providers
   github: {
     connect(server) {
@@ -62,7 +97,7 @@ module.exports = {
               profile: {...profile, _raw: false}})));
 
       server.get('/auth/github', saveReferrer, passport.authenticate('github'));
-      server.get('/auth/github/callback', this.handleCallback, loadReferrer);
+      server.get('/auth/github/callback', this.handleCallback, auth.validate, loadReferrer);
     },
 
     handleCallback (req, res, next) {
