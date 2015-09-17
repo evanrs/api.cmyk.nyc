@@ -32,8 +32,7 @@ server.use(function (req, res, next) {
 
     next();
   }
-  else
-    res.sendStatus(404)
+  else req.xhr ? res.sendStatus(404) : res.redirect(req.get('referrer'));
     // res.redirect(`https://${req.get('host')}${req.url}`);
 });
 
