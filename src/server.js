@@ -40,7 +40,7 @@ server.use(function (req, res, next) {
 server.use(cors({origin: true, credentials: true}));
 server.use(compression());
 server.use(bodyParser.json());
-server.use(session({secret: auth.SECRET, cookie: auth.COOKIE}));
+server.use(session({secret: auth.SECRET, ...auth.COOKIE}));
 server.use(cookieParser(auth.SECRET, auth.COOKIE));
 server.use(csrf({cookie: true}));
 server.use(passport.initialize());
