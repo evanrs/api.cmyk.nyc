@@ -60,7 +60,7 @@ server.get('/profile', auth.requireUser, function (req, res, next) {
 });
 
 server.get('/', auth.requireUser, function (req, res, next) {
-  res.json(req.user);
+  res.send('these are not the endpoints you\'re looking for');
   next();
 });
 
